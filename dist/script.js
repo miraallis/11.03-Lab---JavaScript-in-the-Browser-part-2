@@ -1,56 +1,41 @@
-// This is a simple JavaScript file that adds interactivity to the HTML page
-// It defines a function to show an alert when a link is clicked
-function sayHello() {
-    alert("Hello, world from javascript!");
-}
-// This function will be called when the link is clicked
-// It shows an alert with a message
-// Ensure the DOM is fully loaded before attaching the event listener
-document.addEventListener("DOMContentLoaded", function() {
-    const link = document.getElementById("hello-link");
-    if (!link) {
-        console.error("Link with ID 'hello-link' not found.");
-        return;
+//create event listeners for inputs
+function domLoaded() {
+    const addButton = document.getElementById("addBtn");
+    const taskInput = document.getElementById("newTask");
+    addButton.addEventListener("click", addBtnClick);
+    taskInput.addEventListener("keyup", function(event) {
+    if (event.key === "Enter") {
+        addBtnClick();
     }
-    link.addEventListener("click", function(event) {
-        event.preventDefault(); // Prevent the default link behavior
-        sayHello();
-    });
-});
-
-async function getRandomJoke() {
-    return fetch('https://icanhazdadjoke.com/', {
-        headers: {
-            'Accept': 'text/plain'
-        }
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-        return response.text();
-    })
-    .catch(error => {
-        console.error('There was a problem fetching the joke:', error);
-        return "Failed to fetch a joke. Please try again later.";
     });
 }
 
-document.addEventListener("DOMContentLoaded", function() {
-    const jokeButton = document.getElementById("joke-button");
-    if (!jokeButton) {
-        console.error("Button with ID 'joke-button' not found.");
-        return;
-    }
-    jokeButton.addEventListener("click", async function() {
+//extract the text from the text input then 
+function addBtnClick() {
+    const taskInput = document.getElementById("newTask");
+    const newTask = taskInput.value;
+    if (newTask !== "") {
+    addTask(newTask);
+    taskInput.value = ""; // clear textbox
+}
+}
+//create a new li element for the task and append it to the ol parent element
+function addTask(taskText) {
+    const li = document.createElement("li");
+    li.innerHTML = `<span class="task-text">${taskText}</span><button class="done-btn">&#10006;</button>`;
+    const taskList = document.querySelector("ol");
+    taskList.appendChild(li);
+    //add event listener to last x button for removing
+    const doneButtons = document.querySelectorAll(".done-btn");
+    const lastButton = doneButtons[doneButtons.length - 1];
+    lastButton.addEventListener("click", removeTask);
+}
 
-            const jokeDisplay = document.getElementById("joke-display");
-            if (!jokeDisplay) {
-                console.error("Element with ID 'joke-display' not found.");
-                return;
-            }
-            jokeDisplay.textContent = "Loading joke...";
-            const joke = await getRandomJoke();
-            jokeDisplay.textContent = joke;
-    });
-});
+function removeTask(event) {
+    const buttonClicked = event.target;
+    const liToRemove = buttonClicked.parentNode;
+    const ol = liToRemove.parentNode;
+    ol.removeChild(liToRemove);
+}
+
+window.addEventListener("DOMContentLoaded", domLoaded);
